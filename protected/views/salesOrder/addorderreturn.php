@@ -1,0 +1,427 @@
+<?php
+
+$token = hash('sha256', uniqid(mt_rand(), true));
+$date= date('m/d/Y');
+//echo $date; exit;
+$sql = "SELECT next_reference FROM 0_sys_types WHERE type_id = 12";
+
+  $command = Yii::app()->db->createCommand($sql);
+     $lid= $command->queryRow();
+     $lid=$lid['next_reference'];
+                        
+?>
+
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script>
+    $('document').ready( function () {
+        
+        
+     var car = { trans_no: '', old_ref: '0', bank_account: '1', customer_id: '<?php echo $data['customer'] ?>' , BranchID: '<?php echo $data['branch'] ?>',DateBanked: '<?php echo $date ?>', ref: '<?php echo $lid ?>' , bank_amount: '<?php echo $data['amount'] ?>' , charge: '0', TotalNumberOfAllocs:'0', discount:'0',amount:'<?php echo $data['amount'] ?>',memo_:'Customer payment against order no <?php echo  $data["id"] ?> ',AddPaymentItem:'Add Payment',_focus:'bank_account',_modified:'0',_token:'<?php echo $token ?>'   };
+    
+var data1 ={ui_mode:'1',user_name_entry_field:'admin',password:'admin',company_login_name:0,SubmitUser:'Login -->',_focus:'user_name_entry_field',_modified:0,_token:'<?php echo $token ?>'};
+    $.ajax({
+    
+    type: "POST",
+    url: "../mohsinfoods/index.php",
+
+     data: data1,
+
+    success: function (data) {
+
+       
+       $.ajax({
+    
+    type: "POST",
+    url: "../mohsinfoods/sales/customer_payments.php",
+   
+     data: car,
+   
+    success: function (data) {
+   
+    }
+});
+
+
+
+
+       //  alert(data);
+    }
+});
+
+
+   
+  
+
+
+});
+</script>
+
+	
+<?php 
+
+//
+
+$sql_user="SELECT * FROM  `login` where id = ".$order['booked_by'];
+//echo $sql_user;
+$sql_user = Yii::app()->db->createCommand($sql_user);
+$sql_user= $sql_user->queryRow();
+//print_r ($sql_user);
+
+$sql_customer_deb="SELECT * FROM  `0_debtors_master` where debtor_no = ".$order['customer_id'];
+$sql_customer_deb = Yii::app()->db->createCommand($sql_customer_deb);
+$sql_customer_deb= $sql_customer_deb->queryRow();
+
+$sql_customer="SELECT * FROM  `0_crm_persons` where name = '".$sql_customer_deb['name']."'";
+$sql_customer = Yii::app()->db->createCommand($sql_customer);
+$sql_customer= $sql_customer->queryRow();
+
+?> 
+
+						
+<table id ='pdata' width="800" border="0" align="center" cellpadding="0" cellspacing="0">
+<tr>
+    <td>
+        <table width="100%"  border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="400" >
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:#000 solid 2px; border-radius:10px !important; ">
+          <tr>
+            <td width="35%"> 
+                <strong style="padding-left:5px; font-weight:bold; border-bottom:2px solid; "> Order # <?php echo 'BO-'.$order['id'].'temp'?></strong></td>
+            <td width="65%" height="30"> 
+                <strong style="padding-left:5px; font-weight:bold; padding-left:20px; border-bottom:2px solid; "> User: <?php echo $sql_user['name']; ?></strong> </td>
+          </tr>
+          <tr>
+            <td height="25"> 
+                <strong style="padding-left:5px; font-weight:bold"> Booking Date</strong></td>
+            <td height="25"><?php echo date('l,d-F-Y',  strtotime($order['booking_date']))?></td>
+          </tr>
+          <tr>
+            <td height="25">
+                <strong style="padding-left:5px; font-weight:bold"> Booking Time</strong></td>
+            <td height="20"><?php echo $order['booking_time']?></td>
+          </tr>
+          <tr>
+            <td height="25"> <strong style="padding-left:5px; font-weight:bold"> Name</strong></td>
+            <td height="20"><?php echo $sql_customer['name']?></td>
+          </tr>
+          <tr>
+            <td height="25"> <strong style="padding-left:5px; font-weight:bold"> Cell/Phone</strong></td>
+            <td height="20"><?php echo $sql_customer['phone']; ?></td>
+          </tr>
+          <tr>
+            <td height="25"> <strong style="padding-left:5px; font-weight:bold"> Address</strong></td>
+            <td height="20"><?php echo $sql_customer['address']; ?></td>
+          </tr>
+        </table></td>
+        <td width="10" rowspan="3"></td>
+        <td width="380">&nbsp;</td>
+      </tr>
+      <tr>
+        <td height="10"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:#000 solid 2px; border-radius:10px !important;">
+          <tr>
+            <td width="30%"><strong style="font-weight:bold; padding-left:5px;">Delivery Place</strong></td>
+            <td width="70%"><?php echo $order['delivery_address']; ?></td>
+            </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td height="25%" rowspan="4"><p>
+                    <?php 
+                    if($order['fare_charges'] != 0){
+                        echo 'DELIVERY CHARGES'.'&nbsp;&nbsp;&nbsp;&nbsp;'.$order['fare_charges'];
+                       }
+                     else{
+                         echo 'FREE DELIVERY OR PICK UP ';
+                         
+                     }
+                    
+                    ?>
+                
+                     </p>
+			  </td>
+            </tr>
+          <tr>
+            <td>&nbsp;</td>
+            </tr>
+          <tr>
+            <td>&nbsp;</td>
+            </tr>
+          <tr>
+            <td>&nbsp;</td>
+            </tr>
+        </table></td>
+        <td align="left" valign="top">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:#000 solid 2px; border-radius:10px;">
+          <tr>
+            <td colspan="2">
+                <strong style="font-weight:bold; padding-left:10px; text-decoration: underline; border-radius:10px !important;">Event Date</strong></td>
+            </tr>
+          <tr>
+            <td colspan="2">
+                <label style="cursor: default;padding-left:10px;"><?php echo date('l,d-F-Y',  strtotime($order['delivery_date'])); ?></label>
+            </td>
+            </tr>
+          <tr>
+            <td width="26%">
+                <strong style="font-weight:bold; text-decoration:underline; padding-left:10px;"><?php echo $order['lunch_dinner']; ?></strong></td>
+            <td width="74%"><strong style="font-weight:bold; text-decoration:underline; padding-left:10px;"> </strong><?php echo $order['delivery_time']; ?></td>
+            </tr>
+          <tr>
+            <td colspan="2"><label style="padding-left:10px;"><?php echo $order['event']; ?></label></td>
+          </tr>
+           <tr>
+            <td width="25%"><strong style="font-weight:bold; padding-left:5px; text-decoration: underline; border-radius:10px !important;">Booking Type</strong></td>
+            <td width="75%"><strong style="font-weight:bold; padding-left:10px;  border-radius:10px !important;">
+                    <?php if($order['kg'] == 1){
+                       echo 'Per Person @ '.$order['rate'].'/each for '.$order['guest'].' persons';
+                    }
+                    else{
+                      echo 'Per kG';  
+                        
+                    }?>
+                    
+                </strong></td>
+            </tr>
+          <tr>
+            <td colspan="2">&nbsp;</td>
+            </tr>
+        </table></td>
+      </tr>
+    </table>
+        
+    </td>
+</tr>
+  <tr>
+    <td height="10"></td>
+  </tr>
+  <tr>
+    <td height="10"></td>
+  </tr>
+  <tr></tr>
+  <tr></tr>
+  <tr>
+    <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:#000 solid 2px; margin-top:10px; border-radius:10px !important;">
+      <tr style="text-align:center; border-radius:10px !important;">
+        <td width="33" style=" font-weight:bold; height:25px; padding-left:5px;  border-bottom:#000000 solid 2px; background-color:#CCC !important;">S#</td>
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="143" style=" font-weight:bold; height:25px; padding-left:5px;  border-bottom:#000000 solid 2px; background-color:#CCC !important;">Items</td>
+
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="112" style=" font-weight:bold; height:25px; padding-left:5px; border-bottom:#000000 solid 2px; background-color:#CCC !important;">Remarks</td>
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="219" style=" font-weight:bold; height:25px; padding-left:5px; border-bottom:#000000 solid 2px; background-color:#CCC !important;">P/Kgs</td>
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="122" style=" font-weight:bold; height:25px; padding-left:5px; border-bottom:#000000 solid 2px; background-color:#CCC !important;">Daig</td>
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="66" style=" font-weight:bold; height:25px; padding-left:5px; border-bottom:#000000 solid 2px; background-color:#CCC !important">Rates</td>
+        <td width="2" rowspan="10" style="background-color:#000;"></td>
+        <td width="91" style="font-weight:bold; height:25px; padding-left:5px; border-bottom:2px solid #000; background-color:#CCC !important;">Amount </td>
+        </tr>
+        
+        
+        <?php foreach($orderdetail as $detail){
+
+            
+$sql_party="SELECT sum(amount) FROM  `customer_order_detail` where kit_id ='".$detail['id']."' and party = 0";
+//echo $sql_party;
+$sql_party = Yii::app()->db->createCommand($sql_party);
+$sqlamt= $sql_party->queryRow();
+
+$sqlamt=$sqlamt['sum(amount)']+$detail['amount'];
+
+            
+$sql_party="SELECT count(*) FROM  `customer_order_detail` where kit_id ='".$detail['id']."' and party = 1";
+$sql_party = Yii::app()->db->createCommand($sql_party);
+$sql_party= $sql_party->queryRow();
+
+$sql_party1="SELECT * FROM  `customer_order_detail` where kit_id ='".$detail['id']."'  and editable=1";
+$sql_item_qty = Yii::app()->db->createCommand($sql_party1);
+$sql_item_qty= $sql_item_qty->queryAll();
+            $i=1;
+            $str='';
+            foreach ($sql_item_qty as $item_aty)
+            {
+                $str.=$item_aty['qty'].'X';
+            }
+    // trim($str, "X");
+    $str= substr_replace($str ,"",-1);
+            ?>
+      <tr style="text-align:center;">
+        <td ><?php echo $i;?> </td>
+        <td ><p><?php echo $detail['item']; ?><br />
+          <?php echo $str ?></p></td>
+        <td ><?php echo $detail['desp']; ?></td>
+        <td  valign="top">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="55" height="50" ></td>
+            <td width="2" rowspan="2" style="background-color:#000;"></td>
+            <td width="100"  style="margin-top:10px;"><?php if($order['kg'] != 1) echo $detail['qty'].'Kgs'; ?></td>
+          </tr>
+         
+        </table></td>
+        <td  align="left" valign="top">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr style="text-align:center">
+            <td width="25" height="48" ></td>
+            <td width="2" rowspan="4" style="background-color:#000;"></td>
+            <td width="25" ><?php echo $detail['daigh']; ?></td>
+            <td width="2" rowspan="7" style="background-color:#000;"></td>
+            <td width="25" ><?php if($sql_party['count(*)'] > 0) echo 'Party'; else echo '&nbsp; Cat ' ?></td>
+          </tr>
+          
+        </table></td>
+         <?php if($order['kg'] == 0){ ?>
+        <td style=" text-align:right;"><?php echo $sqlamt ?></td>
+        <td style=" text-align:right;"><?php echo $sqlamt*$detail['qty']; ?></td>
+         <?php }
+         
+         else 
+         {?>
+        <td style=" text-align:right;"></td>
+        <td style=" text-align:right;"></td>
+         <?php } ?>
+        </tr>
+     
+        
+        <?php 
+        $i++;
+        } ?>
+      <tr>
+        
+        
+        </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td style="text-align:center; font-weight:bold;">&nbsp;</td>
+        <td style="text-align:center;">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="91%" style="text-align:center; font-weight:bold;">Payment Mode &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cash</td>
+        <td width="9%" style=" text-align:right;"><?php 
+        
+        $Items_to=$order['total']-($order['fare_charges']+$order['service_charges']+$order['packing_charges']);
+        
+        echo $Items_to; ?></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="91%" style="text-align:right;">Conveyance Charges</td>
+        <td width="9%" style="text-align:right;"><?php echo $order['fare_charges']; ?></td>
+      </tr>
+      <tr>
+        <td style=" text-align:right;">Regular Service Charges</td>
+        <td style=" text-align:right;"><?php echo $order['service_charges']; ?></td>
+      </tr>
+      
+       <tr>
+        <td style=" text-align:right;">Bbq Service Charges</td>
+        <td style=" text-align:right;"><?php echo $order['bbq_charges']; ?></td>
+      </tr>
+      
+       <tr>
+        <td style=" text-align:right;">Packing Service Charges</td>
+        <td style=" text-align:right;"><?php echo $order['packing_charges']; ?></td>
+      </tr>
+      
+       
+    </table></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="68%">&nbsp;</td>
+        <td width="23%" style="text-align:center">&nbsp;</td>
+        <td width="9%" style="text-align:center">&nbsp;</td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Rupees in Words</td>
+        <td style="text-align:center; border-top:1px solid">Gross Total</td>
+        <td style="text-align:right; border-top:1px solid">
+            <?php 
+            
+            $gross=$order['total']+$order['fare_charges']+$order['service_charges']+$order['packing_charges']+$order['bbq_charges'];
+            echo $order['total'];
+            ?>
+             
+        </td>
+      </tr>
+      <tr>
+        <td><?php echo $order['amt_word']; ?></td>
+        <td style="text-align:center; font-weight:bold;">Advance</td>
+        <td style=" text-align:right;"><?php echo $order['advance']; ?></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td style="text-align:center; border-bottom:1px solid;">Adjustment</td>
+        <td style="text-align:right; border-bottom:1px solid;"><?php echo $order['discount']; ?></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="71%">&nbsp;</td>
+        <td width="20%" style="text-align:center; font-weight:bold;">Receivable:</td>
+        <td width="9%" style=" text-align:right;"><?php 
+        $rec = $order['total']-$order['advance']-$order['discount'];
+        echo $rec; ?>
+        </td>
+      </tr>
+      <tr style="">
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td >&nbsp;</td>
+      </tr>
+      <tr >
+        <td >&nbsp;</td>
+        <td style="border-bottom:1px solid; text-align:center; font-weight:bold;">Net Balance</td>
+        <td style="border-bottom:1px solid; text-align:right; font-weight:bold;"><?php echo $rec;?></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+
+<input type="submit" value="Print" onclick ="print('pdata')" >
+	<script type="text/javascript">
+	$(document).ready(function(e) {
+        
+ 	});
+	
+	   
+	  function print(divID) {
+ 
+        var divElements = document.getElementById(divID).innerHTML;
+
+     myWindow=window.open();
+  
+    myWindow.document.body.innerHTML = "<html><body>"+divElements+"</body></html>";
+  
+    myWindow.print(); 
+    return;
+    }
+
+
+
+	</script>					
+	
+                      
+
+					
